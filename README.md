@@ -20,7 +20,7 @@ Serverless Home Assignment aimed to show my serverless knowledge.
    ```sh
    serverless deploy
 
-## Local Test
+## Running Locally
 
 1. Deploy:
    ```sh
