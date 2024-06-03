@@ -1,0 +1,66 @@
+service: todo-api
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: sa-east-1
+  environment:
+    TODOS_TABLE: todo-list
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+
+layers:
+  jsonSchema:
+    name: ${sls:stage}-jsonschema
+    description: JSON Schema Pip Lib
+    path: layer
+
+functions:
+  createTodo:
+    handler: handler.create_todo
+    layers:
+      - {Ref: JsonSchemaLambdaLayer}
+    events:
+      - http:
+          path: todos
+          method: post
+  getTodo:
+    handler: handler.get_todo
+    events:
+      - http:
+          path: todos/{id}
+          method: get
+  updateTodo:
+    handler: handler.update_todo
+    events:
+      - http:
+          path: todos/{id}
+          method: put
+  deleteTodo:
+    handler: handler.delete_todo
+    events:
+      - http:
+          path: todos/{id}
+          method: delete
+
+resources:
+  Resources:
+    TodosTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TODOS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+plugins:
+  - serverless-offline
