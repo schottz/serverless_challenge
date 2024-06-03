@@ -25,3 +25,9 @@ Serverless Home Assignment aimed to show my serverless knowledge.
 1. Deploy:
    ```sh
    serverless offline
+
+## Testing
+
+```sh
+   pip install -r requirements.txt
+   pytest test_handler.py
