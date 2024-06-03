@@ -3,6 +3,15 @@ import uuid
 import boto3
 from botocore.exceptions import ClientError
 from jsonschema import validate, ValidationError
+import os
+
+
+TABLE_NAME = 'todo-list'
+
+if os.getenv('IS_OFFLINE'):
+    dynamodb = boto3.resource('dynamodb', endpoint_url='http://localhost:8000')
+else:
+    dynamodb = boto3.resource('dynamodb')
 
 create_schema = {
     "properties": {
@@ -22,8 +31,6 @@ update_schema = {
     "required": ["completed"]
 }
 
-dynamodb = boto3.resource('dynamodb')
-table_name = 'todo-list'
 
 def validate_request_body(body, request):
     try:
@@ -42,7 +49,7 @@ def create_todo(event, context):
     
     data = json.loads(event['body'])
     todo_id = str(uuid.uuid4())
-    table = dynamodb.Table(table_name)
+    table = dynamodb.Table(TABLE_NAME)
 
     item = {
         'id': todo_id,
@@ -60,7 +67,7 @@ def create_todo(event, context):
 
 def get_todo(event, context):
     todo_id = event['pathParameters']['id']
-    table = dynamodb.Table(table_name)
+    table = dynamodb.Table(TABLE_NAME)
 
     try:
         response = table.get_item(Key={'id': todo_id})
@@ -91,7 +98,7 @@ def update_todo(event, context):
     
     todo_id = event['pathParameters']['id']
     data = json.loads(event['body'])
-    table = dynamodb.Table(table_name)
+    table = dynamodb.Table(TABLE_NAME)
 
     update_expression = "SET "
     expression_attribute_values = {}
@@ -127,7 +134,7 @@ def update_todo(event, context):
 
 def delete_todo(event, context):
     todo_id = event['pathParameters']['id']
-    table = dynamodb.Table(table_name)
+    table = dynamodb.Table(TABLE_NAME)
 
     try:
         response = table.delete_item(

@@ -64,3 +64,13 @@ resources:
 
 plugins:
   - serverless-offline
+  - serverless-dynamodb
+
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
