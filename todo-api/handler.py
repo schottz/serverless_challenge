@@ -5,13 +5,12 @@ from botocore.exceptions import ClientError
 from jsonschema import validate, ValidationError
 import os
 
-
 TABLE_NAME = 'todo-list'
 
 if os.getenv('IS_OFFLINE'):
     dynamodb = boto3.resource('dynamodb', endpoint_url='http://localhost:8000')
 else:
-    dynamodb = boto3.resource('dynamodb')
+    dynamodb = boto3.resource('dynamodb', region_name='sa-east-1')
 
 create_schema = {
     "properties": {
@@ -31,7 +30,6 @@ update_schema = {
     "required": ["completed"]
 }
 
-
 def validate_request_body(body, request):
     try:
         validate(instance=body, schema=create_schema if request == "create" else update_schema)
@@ -40,7 +38,7 @@ def validate_request_body(body, request):
         return False, str(e)
 
 def create_todo(event, context):
-    is_valid, error_message = validate_request_body(event['body'], "create")
+    is_valid, error_message = validate_request_body(json.loads(event['body']), "create")
     if not is_valid:
         return {
             'statusCode': 400,
@@ -89,7 +87,7 @@ def get_todo(event, context):
         }
 
 def update_todo(event, context):
-    is_valid, error_message = validate_request_body(event['body'], "update")
+    is_valid, error_message = validate_request_body(json.loads(event['body']), "update")
     if not is_valid:
         return {
             'statusCode': 400,
