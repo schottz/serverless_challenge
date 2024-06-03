@@ -74,3 +74,8 @@ custom:
       port: 8000
       inMemory: true
       migrate: true
+
+package:
+  exclude:
+    - node_modules/**
+  individually: true
