@@ -1,9 +1,7 @@
 import json
-import pytest
 import boto3
 from moto import mock_aws
 from handler import create_todo, get_todo, update_todo, delete_todo
-import os
 
 TABLE_NAME = 'todo-list'
 
