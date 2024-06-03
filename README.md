@@ -12,9 +12,10 @@ Serverless Home Assignment aimed to show my serverless knowledge.
 
 ## Setup
 
-1. Install Serverless Framework:
+1. Install Serverless Framework and dependencies:
    ```sh
    npm install -g serverless
+   npm install serverless-offline serverless-dynamodb --save-dev
 
 2. Deploy:
    ```sh
